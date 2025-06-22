@@ -1,10 +1,10 @@
-<?php 
+<?php
 
 $shortopts = "u:";      // value required
 $shortopts .= "p:";     // value required
 $shortopts .= "h:";     // value required
 
-$longopts  = array(
+$longopts = array(
     "file:",            // value required
     "create_table",     // no value accepted
     "dry_run",          // no value accepted
@@ -31,10 +31,11 @@ if (
     (
         array_key_exists("create_table", $options) ||
         array_key_exists("file", $options)
-    ) && 
+    ) &&
     !array_key_exists("dry_run", $options)
- ) {
-    if( !array_key_exists("u", $options) ||
+) {
+    if (
+        !array_key_exists("u", $options) ||
         !array_key_exists("p", $options) ||
         !array_key_exists("h", $options)
     ) {
@@ -51,10 +52,10 @@ if (
 
 // check CSV presence and existance
 if (array_key_exists("file", $options)) {
-    if( !file_exists($options["file"])) {
+    if (!file_exists($options["file"])) {
         exit("Input error: parameter --file, CSV file not found\n\n");
     }
     $filename = $options["file"];
-} elseif(!array_key_exists("create_table", $options)) {
+} elseif (!array_key_exists("create_table", $options)) {
     exit("Input error: parameter --file must be provided\n\n");
 }

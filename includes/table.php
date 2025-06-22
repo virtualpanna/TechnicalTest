@@ -1,6 +1,5 @@
 <?php
 
-
 // drop table 'users' if already exists
 $stmt = $pdo->prepare(query: "SELECT to_regclass(:table_name)");
 $stmt->execute(['table_name' => $db_table]);

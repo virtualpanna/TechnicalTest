@@ -18,14 +18,14 @@ try {
     $dsn = "pgsql:host=$db_host;dbname=$db_name";
     $pdo = new PDO($dsn, $db_user, $db_password);
 
-    // hnadle connection errors as exceptions
+    // set connection errors as exceptions
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-    switch($action) {
+
+    switch ($action) {
         case 'create':
             echo "Building `$db_table` table\n";
             require "includes/table.php";
-            
+
             break;
 
         case 'import':
