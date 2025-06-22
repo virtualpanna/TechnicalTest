@@ -30,7 +30,7 @@ function buildeTable(array $dbParams): void
 
         $dbParams['pdo']->exec($sql);
 
-        echo "Creation of table `" . $dbParams['table'] . "` completed successfully!\n";
+        echo "Creation of table `" . $dbParams['table'] . "` completed\n";
     } catch (Exception $e) {
         echo "table building failed: " . $e->getMessage() . "\n";
     }
@@ -44,8 +44,9 @@ function buildeTable(array $dbParams): void
  *
  * @param array $dbParams conatins all data necessary for db access
  * @param string $filename name of CSV file to be imported
+ * @param bool $dryrun flag indication weather data should be actually inserted into DB 
  */
-function importCsvData(array $dbParams, string $filename): void
+function importCsvData(array $dbParams, string $filename, bool $dryRun): void
 {
     // access CSV file in READ mode
     $handle = fopen($filename, 'r');
@@ -57,40 +58,39 @@ function importCsvData(array $dbParams, string $filename): void
         while (($line = fgets($handle)) !== false) {
             $data = str_getcsv($line);
 
+            // manipulating name and surname
+            $data[0] = ucfirst(strtolower($data[0]));
+            $data[1] = ucfirst(strtolower($data[1]));
+
+            // validating email
+            $data[2] = filter_var(trim($data[2]), FILTER_VALIDATE_EMAIL);
+            $data[2] = $data[2] ? strtolower($data[2]) : "";
+
             // shows record to add
             print_r($data);
 
-            //TODO handle dry run
+            if (!$dryRun) {
+                try {
+                    // prepare SQL statement
+                    $sql = "INSERT INTO users (name, surname, email) VALUES (:name, :surname, :email)";
+                    $stmt = $dbParams['pdo']->prepare($sql);
 
-            try {
-                // prepare SQL statement
-                $sql = "INSERT INTO users (name, surname, email) VALUES (:name, :surname, :email)";
-                $stmt = $dbParams['pdo']->prepare($sql);
+                    // bind statement to parameters
+                    $stmt->bindParam(':name', $data[0]);
+                    $stmt->bindParam(':surname', $data[1]);
+                    $stmt->bindParam(':email', $data[2]);
 
-                // bind statement to parameters
-                $stmt->bindParam(':name', $dataName);
-                $stmt->bindParam(':surname', $dataSurname);
-                $stmt->bindParam(':email', $dataEmail);
+                    // insert only if email is valid
+                    if ($data[2]) {
+                        $stmt->execute();
+                        echo "New record added successfully\n";
+                    } else {
+                        echo "Record skipped, data cannot be parsed corectly\n";
+                    }
 
-                // manipulating name and surname
-                $dataName = ucfirst($data[0]);
-                $dataSurname = ucfirst($data[1]);
-
-                // validating email
-                $dataEmail = filter_var(trim($data[2]), FILTER_VALIDATE_EMAIL)
-                    ? strtolower(filter_var(trim($data[2]), FILTER_VALIDATE_EMAIL))
-                    : "";
-
-                if ($dataName && $dataSurname && $dataEmail) {
-                    // insert record
-                    $stmt->execute();
-                    echo "New record added successfully\n";
-                } else {
-                    echo "Record skipped, data cannot be parsed corectly\n";
+                } catch (PDOException $e) {
+                    echo "Record could not be added:" . $e->getMessage() . "\n";
                 }
-
-            } catch (PDOException $e) {
-                echo "Record could not be added:" . $e->getMessage() . "\n";
             }
 
             echo "\n\n";

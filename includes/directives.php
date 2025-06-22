@@ -14,12 +14,12 @@ function handleDirectives(): ?array
     $shortopts .= "p:";     // value required
     $shortopts .= "h:";     // value required
 
-    $longopts = array(
+    $longopts = [
         "file:",            // value required
         "create_table",     // no value accepted
         "dry_run",          // no value accepted
         "help",             // no value accepted
-    );
+    ];
 
     $options = getopt($shortopts, $longopts);
 
