@@ -103,23 +103,19 @@ function importCsvData(array $dbParams, string $filename, bool $dryRun): void
 }
 
 /**
- * capitalizes specific formats strings that includes `'` characters 
+ * Capitalize specific formats strings that includes `'` characters 
  *
  * @param string $string string that should be capitalized
+ * @return string the capitalized string
  */
 function capitalize(string $name): string
 {
-    // Convert the entire string to lowercase first
     $name = strtolower($name);
-
-    // Split the string by the apostrophe
     $parts = explode("'", $name);
 
-    // Capitalize the first letter of each part
     foreach ($parts as &$part) {
         $part = ucfirst($part);
     }
 
-    // Join the parts back together with the apostrophe
     return implode("'", $parts);
 }
