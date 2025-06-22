@@ -7,7 +7,7 @@
 /************************* */
 
 require "includes/directives.php";
-require "includes/database.php";
+require "includes/import.php";
 
 $directives = handleDirectives();
 $dbParams = [];

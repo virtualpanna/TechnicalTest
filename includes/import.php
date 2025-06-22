@@ -59,8 +59,8 @@ function importCsvData(array $dbParams, string $filename, bool $dryRun): void
             $data = str_getcsv($line);
 
             // manipulating name and surname
-            $data[0] = ucfirst(strtolower($data[0]));
-            $data[1] = ucfirst(strtolower($data[1]));
+            $data[0] = capitalize($data[0]);
+            $data[1] = capitalize($data[1]);
 
             // validating email
             $data[2] = filter_var(trim($data[2]), FILTER_VALIDATE_EMAIL);
@@ -100,4 +100,26 @@ function importCsvData(array $dbParams, string $filename, bool $dryRun): void
     } else {
         echo "Error opening CSV file `filename`.";
     }
+}
+
+/**
+ * capitalizes specific formats strings that includes `'` characters 
+ *
+ * @param string $string string that should be capitalized
+ */
+function capitalize(string $name): string
+{
+    // Convert the entire string to lowercase first
+    $name = strtolower($name);
+
+    // Split the string by the apostrophe
+    $parts = explode("'", $name);
+
+    // Capitalize the first letter of each part
+    foreach ($parts as &$part) {
+        $part = ucfirst($part);
+    }
+
+    // Join the parts back together with the apostrophe
+    return implode("'", $parts);
 }
