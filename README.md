@@ -1,8 +1,8 @@
-Command line PHP script for importing a CSV file in a specific format
+Command line PHP script for importing into a PG database a CSV file in a specific format
 
 ## Documentation for TechnicalTest
 
-### Assumpitons
+### Assumptions
 List of assumptions I used while developing:
 
 1. while parinsg the CSV if the fields NAME and USERNAME are empty the record will be created anyway
@@ -12,6 +12,8 @@ List of assumptions I used while developing:
 5. both NAME and SURNAME are capitalised after being set to full lowercase, this will handle most of cases as requested, but it will not work nicely on some formats (i.e. O'Hara)
 
 ### Possible Optimizations
+List of possible improvements to my solution:
+
 1. Database insert are done one at a time in this version, this can work poorly on performance on a large set of records. A possible improvement could be "packing" groups of INSERT of a desired size in order to do mass insert
 2. Objects could also be user to save data for each User, this can help on testing. Considering the nature of the exerices and that no high level framework has been used, I opted for plain array
 3. Adding Unit Tests is also a possible improvement
