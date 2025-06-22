@@ -7,30 +7,42 @@
 /************************* */
 
 require "includes/directives.php";
+require "includes/database.php";
 
-$db_name = "techtest_1";
-$db_table = 'users';
+$directives = handleDirectives();
 
-echo "Action $action\n\n";
+$dbParams = array(
+    "name" => "techtest_1",
+    "table" => "users",
+    "host" => $directives['h'],
+    "user" => $directives['u'],
+    "password" => $directives['p'],
+);
+
+$action = array_key_exists("create_table", $directives)
+    ? "build"
+    : "import";
 
 try {
     // using PDO to access DB
-    $dsn = "pgsql:host=$db_host;dbname=$db_name";
-    $pdo = new PDO($dsn, $db_user, $db_password);
+    $dsn = "pgsql:host=" . $dbParams['host'] . ";dbname=" . $dbParams['name'] . "";
+    $pdo = new PDO($dsn, $dbParams['user'], $dbParams['password']);
 
     // set connection errors as exceptions
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    $dbParams['pdo'] = $pdo;
+
     switch ($action) {
-        case 'create':
-            echo "Building `$db_table` table\n";
-            require "includes/table.php";
+        case 'build':
+            echo "Building `" . $dbParams['table'] . "` table\n";
+            buildeTable($dbParams);
 
             break;
 
         case 'import':
             echo "Importing data... \n";
-            require "includes/import.php";
+            importCsvData($dbParams, $directives['file']);
 
             break;
     }
