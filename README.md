@@ -3,9 +3,9 @@ Command line PHP script for importing into a PostgreSQL database a CSV file in a
 ## Documentation for TechnicalTest
 
 ### Development decisions
-1. I decided to use PDO extension (pdo_pgsql) for PostgreSQL database connection, since it is included in common php distibution and it's easy to enable
+1. I decided to use PDO extension (pdo_pgsql) for PostgreSQL database connection, since it is included in common php distribution and it's easy to enable
 2. I used `fgets` and `str_getcsv` to parse the CSV file, since they are native PHP functions and the scope of the exercise didn;t need any advanced CSV manipulation
-3. I used **composer** as package manager in order to use PhpUnit for Automated Testing
+3. I used **composer** as package manager in order to use PhpUnit for Automated Testing, to launch PHPUnit tests the command `composer install` needs to be executed beforehand
 
 ### Assumptions
 List of assumptions I used while developing:
