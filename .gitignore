@@ -1,0 +1,14 @@
+# Composer dependencies
+/vendor/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# IDE specific files
+.vscode/
+
+# PHPUnit
+phpunit.xml
+phpunit.xml.dist
