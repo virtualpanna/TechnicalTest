@@ -9,14 +9,28 @@
 require "includes/directives.php";
 require "includes/import.php";
 
-$directives = handleDirectives();
-$dbParams = [];
-
-$action = isset($directives['create_table'])
-    ? "build"
-    : "import";
-
 try {
+    $dbParams = [
+        "name" => '',
+        "table" => '',
+        "host" => '',
+        "user" => '',
+        "password" => '',
+    ];
+    
+    $directives = handleDirectives() ?? [
+        'u' => '',
+        'h' => '',
+        'p' => '',
+        'file' => '',
+        'create_table' => '',
+        'dry_run' => '',
+    ];
+
+    $action = isset($directives['create_table'])
+        ? "build"
+        : "import";
+
     $dryRun = isset($directives['dry_run']) ? true : false;
 
     if (!$dryRun) {
@@ -30,7 +44,7 @@ try {
         ];
 
         // using PDO to access DB
-        $dsn = "pgsql:host=" . $dbParams['host'] . ";dbname=" . $dbParams['name'] . "";
+        $dsn = "pgsql:host=" . $dbParams['host'] . ";dbname=" . $dbParams['name'];
         $pdo = new PDO($dsn, $dbParams['user'], $dbParams['password']);
 
         // set connection errors as exceptions
@@ -63,5 +77,5 @@ try {
     }
 
 } catch (PDOException $e) {
-    echo "DB connection failed: " . $e->getMessage() . "\n";
+    echo "Exception: " . $e->getMessage() . "\n";
 }
