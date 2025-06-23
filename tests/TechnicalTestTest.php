@@ -50,9 +50,11 @@ class TechnicalTestTest extends TestCase
         );
     }
 
-    public function testCreateTableDirective()
+    private function runCreateTable(): ?array
     {
-        // get command parameters from config file
+        $output = [];
+
+        // setup create_table command with parametrs from config
         $command = sprintf(
             'php user_upload.php --create_table -h %s -u %s -p %s',
             escapeshellarg($this->config['DB_HOST']),
@@ -61,6 +63,27 @@ class TechnicalTestTest extends TestCase
         );
 
         exec($command, $output);
+
+        return $output;
+    }
+
+    private function assertTableCount(int $expectedCount) {
+        $query = "SELECT COUNT(*) AS count FROM users";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Assert that the actual count matches the expected count
+        $this->assertEquals(
+            $expectedCount,
+            $result['count'],
+        );
+    }
+
+    public function testCreateTableDirective()
+    {
+        $output = $this->runCreateTable();
 
         // assert command executes successfully
         $this->assertStringContainsString(
@@ -81,18 +104,62 @@ class TechnicalTestTest extends TestCase
             "Table '$tableName' does not exist."
         );
 
-        $query = "SELECT COUNT(*) AS count FROM $tableName";
+        $this->assertTableCount(0);
+    }
+
+    public function testImportDirective()
+    {
+        $output = [];
+
+        $this->runCreateTable();
+
+        // execute import command
+        $command = sprintf(
+            'php user_upload.php --file data/users.csv -h %s -u %s -p %s',
+            escapeshellarg($this->config['DB_HOST']),
+            escapeshellarg($this->config['DB_USER']),
+            escapeshellarg($this->config['DB_PWD']),
+        );
+
+        exec($command, $output);
+
+        // assert command output is as expected
+        $this->assertStringContainsString(
+            "Importing CSV data",
+            implode("\n", $output)
+        );
+
+        // assert first user of CSV is present in DB
+        $query = "SELECT COUNT(*) AS count FROM users WHERE email = :email";
         $stmt = $this->pdo->prepare($query);
-        $stmt->execute();
+        $stmt->execute(['email' => 'jsmith@gmail.com']);
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $this->assertEquals(1, $result['count']);
 
-        // assert table is empty
-        $this->assertEquals(
-            0,
-            $result['count'],
-            "Table '$tableName' is not empty."
+        // assert that command imported all expected users
+        $this->assertTableCount(9);
+    }
+
+    public function testDryRunDirective()
+    {
+        $output = [];
+
+        $this->runCreateTable();
+
+        // execute import command
+        $command = 'php user_upload.php --file data/users.csv --dry_run';
+
+        exec($command, $output);
+
+        // assert command executes successfully
+        $this->assertStringContainsString(
+            "Parsing CSV data, but no import",
+            implode("\n", $output)
         );
+
+        // assert that command did not create any user in table users
+        $this->assertTableCount(0);
     }
 
 }
